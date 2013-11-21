@@ -8,24 +8,28 @@ import (
 
 const VERSION = "0.0.1"
 
+var modules map[string]ModuleInterface
+
 func init() {
-	fmt.Println("Init focust")
+	modules = make(map[string]ModuleInterface)
 }
 
-func Router(path string, ids [2]int, module *ModuleInterface) error {
-	return nil
+func Serve(path string, module ModuleInterface) {
+	if _, ok := modules[path]; ok {
+		panic(fmt.Sprintf("Aleady exist module to serve path:\"%s\"", path))
+	}
+	module.Init()
+	modules[path] = module
+
+	fmt.Printf("Use module:%s to serve path:\"%s\"\n", module.GetName(), path)
 }
 
 func Run() {
-	fmt.Println("Running...")
-	// run websocket here
-	http.Handle("/", websocket.Server{Handler: handler})
-}
+	for path, module := range modules {
+		http.Handle(path, websocket.Server{Handler: module.Handler})
+	}
 
-func handler(ws *websocket.Conn) {
-
-	for {
-
-		break
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		panic("ListenAndServe: " + err.Error())
 	}
 }
