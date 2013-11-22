@@ -19,6 +19,7 @@ type ModuleInterface interface {
 
 func (m *Module) Handler(ws *websocket.Conn) {
 
+	m.Parser.Parse(ws)
 	for {
 		var content string
 		if err := websocket.Message.Receive(ws, &content); err != nil {

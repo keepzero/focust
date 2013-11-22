@@ -9,8 +9,8 @@ type ParserInterface interface {
 	ParseContent(string) (interface{}, interface{}, error)
 }
 
-func (p *Parser) Parse(ws *websocket.Conn) (interface{}, string, error) {
-	// default return nil
+func (p *Parser) Parse(ws *websocket.Conn) (interface{}, interface{}, error) {
+	Logger.Info("Accept Websocket Conn from %s", ws.Request().RemoteAddr)
 	return nil, "", nil
 }
 
