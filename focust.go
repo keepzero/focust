@@ -4,32 +4,36 @@ import (
 	"code.google.com/p/go.net/websocket"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 const VERSION = "0.0.1"
 
-var modules map[string]ModuleInterface
+var Modules map[string]ModuleInterface
 
 func init() {
-	modules = make(map[string]ModuleInterface)
+	Modules = make(map[string]ModuleInterface)
+	if err := ParseConfig(); err != nil {
+		panic(err.Error())
+	}
 }
 
 func Serve(path string, module ModuleInterface) {
-	if _, ok := modules[path]; ok {
+	if _, ok := Modules[path]; ok {
 		panic(fmt.Sprintf("Aleady exist module to serve path:\"%s\"", path))
 	}
-	module.Init()
-	modules[path] = module
-
-	fmt.Printf("Use module:%s to serve path:\"%s\"\n", module.GetName(), path)
+	Modules[path] = module
 }
 
 func Run() {
-	for path, module := range modules {
+	SetLevel(LogLevel)
+
+	for path, module := range Modules {
+		module.Init()
 		http.Handle(path, websocket.Server{Handler: module.Handler})
 	}
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":"+strconv.Itoa(WsPort), nil); err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
 }
