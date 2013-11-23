@@ -26,9 +26,8 @@ func Serve(path string, module ModuleInterface) {
 }
 
 func Run() {
-	SetLevel(LogLevel)
-
 	for path, module := range Modules {
+		module.setHandlers(module.GetHandlers())
 		module.Init()
 		http.Handle(path, websocket.Server{Handler: module.Handler})
 	}

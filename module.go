@@ -12,8 +12,10 @@ type Module struct {
 }
 
 type ModuleInterface interface {
-	getHandler(interface{}) func(interface{}) (string, error)
+	setHandlers(map[interface{}]func(interface{}) (string, error))
+	GetHandlers() map[interface{}]func(interface{}) (string, error)
 	Handler(*websocket.Conn)
+
 	Init()
 }
 
@@ -55,7 +57,7 @@ func (m *Module) getHandler(index interface{}) func(interface{}) (string, error)
 	}
 }
 
-func (m *Module) SetHandlers(hs map[interface{}]func(interface{}) (string, error)) {
+func (m *Module) setHandlers(hs map[interface{}]func(interface{}) (string, error)) {
 	if m.Handlers == nil {
 		m.Handlers = make(map[interface{}]func(interface{}) (string, error))
 	}

@@ -23,7 +23,18 @@ func SetLevel(l int) {
 // logger references the used application logger.
 var Logger *logs.BeeLogger
 
-func init() {
-	Logger = logs.NewLogger(100)
-	Logger.SetLogger("console", "")
+func Log(level int, format string, v ...interface{}) {
+	if level == LevelTrace {
+		Logger.Trace(format, v...)
+	} else if level == LevelDebug {
+		Logger.Info(format, v...)
+	} else if level == LevelInfo {
+		Logger.Info(format, v...)
+	} else if level == LevelWarning {
+		Logger.Warn(format, v...)
+	} else if level == LevelError {
+		Logger.Error(format, v...)
+	} else if level == LevelCritical {
+		Logger.Critical(format, v...)
+	}
 }
