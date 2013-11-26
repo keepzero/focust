@@ -1,38 +1,31 @@
 package focust
 
 import (
-	//"github.com/astaxie/beego/config"
-	"github.com/astaxie/beego/logs"
-	"os"
-	"path"
+	"github.com/astaxie/beego/config"
 )
 
 var (
 	AppName       string
 	AppPath       string
 	AppConfigPath string
-
-	WsPort   int
-	LogLevel int
+	WsPort        int
+	LogLevel      int
 )
 
-func init() {
-	// default value
-	AppName = "focust"
-	AppPath = path.Dir(os.Args[0])
-	AppConfigPath = path.Join(AppPath, "conf", "app.yaml")
-}
-
+// Read config file and init
 func ParseConfig() error {
 
-	// read from config file
-	WsPort = 8080
-	LogLevel = LevelTrace
+	AppConfig, err := config.NewConfig("yaml", AppConfigPath)
+	if err != nil {
+		return err
+	}
 
-	// Init
-	Logger = logs.NewLogger(100)
-	Logger.SetLogger("console", "")
-	Logger.SetLevel(LogLevel)
+	if v, err := AppConfig.Int("wsport"); err == nil {
+		WsPort = v
+	}
+
+	//LogLevel = LevelTrace
+	//Logger.SetLevel(LogLevel)
 
 	return nil
 }

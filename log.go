@@ -14,8 +14,7 @@ const (
 	LevelCritical
 )
 
-// SetLogLevel sets the global log level used by the simple
-// logger.
+// SetLogLevel sets the global log level used by the simple logger.
 func SetLevel(l int) {
 	Logger.SetLevel(l)
 }
@@ -23,6 +22,7 @@ func SetLevel(l int) {
 // logger references the used application logger.
 var Logger *logs.BeeLogger
 
+// Used for unify log format
 func Log(level int, format string, v ...interface{}) {
 	if level == LevelTrace {
 		Logger.Trace(format, v...)
