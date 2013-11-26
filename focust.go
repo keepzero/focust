@@ -3,7 +3,10 @@ package focust
 import (
 	"code.google.com/p/go.net/websocket"
 	"fmt"
+	"github.com/astaxie/beego/logs"
 	"net/http"
+	"os"
+	"path"
 	"strconv"
 )
 
@@ -12,9 +15,22 @@ const VERSION = "0.0.1"
 var Modules map[string]ModuleInterface
 
 func init() {
+	// init focust core
 	Modules = make(map[string]ModuleInterface)
+	Logger = logs.NewLogger(1)
+	Logger.SetLogger("console", "")
+
+	// default config value
+	AppName = "focust"
+	AppPath = path.Dir(os.Args[0])
+	AppConfigPath = path.Join(AppPath, "conf", "app.yaml")
+	WsPort = 8080
+	LogLevel = LevelTrace
+	Logger.SetLevel(LogLevel)
+
+	// init others in ParseConfig func
 	if err := ParseConfig(); err != nil {
-		panic(err.Error())
+		Log(LevelError, "Parse config error. %v", err)
 	}
 }
 
@@ -27,8 +43,8 @@ func Serve(path string, module ModuleInterface) {
 
 func Run() {
 	for path, module := range Modules {
-		module.setHandlers(module.GetHandlers())
 		module.Init()
+		module.setHandlers(module.GetHandlers())
 		http.Handle(path, websocket.Server{Handler: module.Handler})
 	}
 
