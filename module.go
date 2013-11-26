@@ -7,13 +7,13 @@ import (
 )
 
 type Module struct {
-	Handlers map[interface{}]func(interface{}) (string, error)
+	Handlers map[interface{}]func(*websocket.Conn, interface{}) (string, error)
 	Parser   ParserInterface
 }
 
 type ModuleInterface interface {
-	setHandlers(map[interface{}]func(interface{}) (string, error))
-	GetHandlers() map[interface{}]func(interface{}) (string, error)
+	setHandlers(map[interface{}]func(*websocket.Conn, interface{}) (string, error))
+	GetHandlers() map[interface{}]func(*websocket.Conn, interface{}) (string, error)
 	Handler(*websocket.Conn)
 
 	Init()
@@ -35,9 +35,9 @@ func (m *Module) Handler(ws *websocket.Conn) {
 			return
 		}
 
-		response, err := m.getHandler(index)(request)
+		response, err := m.getHandler(index)(ws, request)
 		if err != nil {
-			Logger.Error("Exec command %v error. %v", index, err)
+			Logger.Error("Exec command:%v error. %v", index, err)
 		}
 
 		if err := websocket.Message.Send(ws, response); err != nil {
@@ -47,19 +47,19 @@ func (m *Module) Handler(ws *websocket.Conn) {
 	}
 }
 
-func (m *Module) getHandler(index interface{}) func(interface{}) (string, error) {
+func (m *Module) getHandler(index interface{}) func(*websocket.Conn, interface{}) (string, error) {
 	if fun, ok := m.Handlers[index]; ok {
 		return fun
 	} else {
-		return func(interface{}) (string, error) {
+		return func(*websocket.Conn, interface{}) (string, error) {
 			return "", errors.New(fmt.Sprintf("No handler map to command:%v", index))
 		}
 	}
 }
 
-func (m *Module) setHandlers(hs map[interface{}]func(interface{}) (string, error)) {
+func (m *Module) setHandlers(hs map[interface{}]func(*websocket.Conn, interface{}) (string, error)) {
 	if m.Handlers == nil {
-		m.Handlers = make(map[interface{}]func(interface{}) (string, error))
+		m.Handlers = make(map[interface{}]func(*websocket.Conn, interface{}) (string, error))
 	}
 	for k, v := range hs {
 		m.Handlers[k] = v
