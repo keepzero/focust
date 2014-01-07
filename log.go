@@ -6,12 +6,12 @@ import (
 
 // Log levels to control the logging output.
 const (
-	LevelTrace = iota
-	LevelDebug
-	LevelInfo
-	LevelWarning
-	LevelError
-	LevelCritical
+	Trace = iota
+	Debug
+	Info
+	Warning
+	Error
+	Critical
 )
 
 // SetLogLevel sets the global log level used by the simple logger.
@@ -24,17 +24,17 @@ var Logger *logs.BeeLogger
 
 // Used for unify log format
 func Log(level int, format string, v ...interface{}) {
-	if level == LevelTrace {
+	if level == Trace {
 		Logger.Trace(format, v...)
-	} else if level == LevelDebug {
+	} else if level == Debug {
+		Logger.Debug(format, v...)
+	} else if level == Info {
 		Logger.Info(format, v...)
-	} else if level == LevelInfo {
-		Logger.Info(format, v...)
-	} else if level == LevelWarning {
+	} else if level == Warning {
 		Logger.Warn(format, v...)
-	} else if level == LevelError {
+	} else if level == Error {
 		Logger.Error(format, v...)
-	} else if level == LevelCritical {
+	} else if level == Critical {
 		Logger.Critical(format, v...)
 	}
 }

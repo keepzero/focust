@@ -17,7 +17,7 @@ var Modules map[string]ModuleInterface
 func init() {
 	// init focust core
 	Modules = make(map[string]ModuleInterface)
-	Logger = logs.NewLogger(1)
+	Logger = logs.NewLogger(1000)
 	Logger.SetLogger("console", "")
 
 	// default config value
@@ -25,12 +25,12 @@ func init() {
 	AppPath = path.Dir(os.Args[0])
 	AppConfigPath = path.Join(AppPath, "conf", "app.yaml")
 	WsPort = 8080
-	LogLevel = LevelTrace
+	LogLevel = Trace
 	Logger.SetLevel(LogLevel)
 
 	// init others in ParseConfig func
 	if err := ParseConfig(); err != nil {
-		Log(LevelError, "Parse config error. %v", err)
+		Log(Error, "Parse config error. %v", err)
 	}
 }
 
@@ -41,10 +41,18 @@ func Serve(path string, module ModuleInterface) {
 	Modules[path] = module
 }
 
+func ServeHTTP(path string, handler func(http.ResponseWriter, *http.Request)) {
+	if _, ok := Modules[path]; ok {
+		panic(fmt.Sprintf("Aleady exist module to serve path:\"%s\"", path))
+	}
+	http.HandleFunc(path, handler)
+}
+
 func Run() {
 	for path, module := range Modules {
 		module.Init()
 		module.setHandlers(module.GetHandlers())
+		module.setDefaultHandler(module.Error404)
 		http.Handle(path, websocket.Server{Handler: module.Handler})
 	}
 
