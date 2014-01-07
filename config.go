@@ -2,6 +2,7 @@ package focust
 
 import (
 	"github.com/astaxie/beego/config"
+	"strings"
 )
 
 var (
@@ -20,12 +21,29 @@ func ParseConfig() error {
 		return err
 	}
 
+	// Websocket Port
 	if v, err := AppConfig.Int("wsport"); err == nil {
 		WsPort = v
 	}
 
-	//LogLevel = LevelTrace
-	//Logger.SetLevel(LogLevel)
+	// LogLevel
+	if v := AppConfig.String("level"); v != "" {
+		switch strings.ToLower(v) {
+		case "debug":
+			LogLevel = Debug
+		case "info":
+			LogLevel = Info
+		case "warning":
+			LogLevel = Warning
+		case "error":
+			LogLevel = Error
+		case "critical":
+			LogLevel = Critical
+		default:
+			LogLevel = Trace
+		}
+		Logger.SetLevel(LogLevel)
+	}
 
 	return nil
 }
