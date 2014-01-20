@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var AppConfig config.ConfigContainer
+
 var (
 	AppName       string
 	AppPath       string
@@ -16,7 +18,8 @@ var (
 // Read config file and init
 func ParseConfig() error {
 
-	AppConfig, err := config.NewConfig("yaml", AppConfigPath)
+	var err error
+	AppConfig, err = config.NewConfig("yaml", AppConfigPath)
 	if err != nil {
 		return err
 	}
