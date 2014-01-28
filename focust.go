@@ -25,6 +25,7 @@ func init() {
 	AppPath = path.Dir(os.Args[0])
 	AppConfigPath = path.Join(AppPath, "conf", "app.yaml")
 	WsPort = 8080
+	AppId = 1
 	LogLevel = Trace
 	Logger.SetLevel(LogLevel)
 

@@ -13,6 +13,7 @@ var (
 	AppConfigPath string
 	WsPort        int
 	LogLevel      int
+	AppId         int
 )
 
 // Read config file and init
@@ -22,6 +23,11 @@ func ParseConfig() error {
 	AppConfig, err = config.NewConfig("yaml", AppConfigPath)
 	if err != nil {
 		return err
+	}
+
+	// AppId
+	if v, err := AppConfig.Int("appid"); err == nil {
+		AppId = v
 	}
 
 	// Websocket Port
